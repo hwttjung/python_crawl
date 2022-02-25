@@ -16,7 +16,7 @@ def dummy_send(element, word, delay):
         sleep(delay)
 
 #   사이트이동 및 창 크게
-browser = webdriver.Chrome("C:/Users/user/Documents/py_crawl/Desktop/python/chromedriver.exe")
+browser = webdriver.Chrome("chromedriver.exe")
 browser.maximize_window()
 browser.get("https://www.ariashop.net/")
 
