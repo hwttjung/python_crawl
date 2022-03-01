@@ -32,9 +32,12 @@ sleep(5)
 
 tit2 = browser.find_elements_by_class_name("tit2")
 sub_depth3 = tit2[0].find_elements_by_class_name("sub_depth3")
+link_list = []
 print(len(sub_depth3))
 for sub in sub_depth3:
     menulist = sub.find_elements_by_css_selector("li")
     for i in range(0,len(menulist)):
         a = menulist[i].find_element_by_css_selector("a")
-        browser.get(a.get_attribute("href"))
+        link = a.get_attribute("href")
+        link_list.append(link)    
+browser.get(link_list[0])
