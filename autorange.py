@@ -40,7 +40,11 @@ for sub in sub_depth3:
         a = menulist[i].find_element_by_css_selector("a")
         link = a.get_attribute("href")
         link_lists.append(link)    
-
-browser.get(link_lists[0])
-j = browser.find_elements_by_css_selector("div.pagination")
-print(j[0])
+for link_list in link_lists :
+    browser.get(link_list)
+    page_section = browser.find_elements_by_css_selector("div.pagination")
+    page_num = page_section[1].find_elements_by_css_selector("li")
+    for j in range(1,len(page_num)+1) :
+        browser.get(link_list+"&page={}".format(j))
+        item_cells = browser.find_elements_by_class_name("dbkCateCheck")
+        print(len(item_cells))
