@@ -58,16 +58,16 @@ for link_list in link_lists :
         browser.implicitly_wait(10)
         item_cells = browser.find_elements_by_class_name("dbkCateCheck")
         cc.append(len(item_cells))
-        for k, item_cell in enumerate(item_cells,1) :
+        
+        for k, item_cell in enumerate(item_cells,0) :
             # 브랜드
             brand = brands[k].find('strong')
             try : 
                 brand_txt = brand.text
                 item_brand = brand_txt.replace('[','').replace(']','')
-            
-            # 이미지
             except Exception :
                 item_brand = ''
+            # 이미지
             image = images[k].find('img')['src']
             try:
                 item_image = 'https://www.ariashop.net/' + image.replace('Main','Detail0')
@@ -99,10 +99,12 @@ for link_list in link_lists :
             except Exception :
                 item_count = 1
         # 데이터 수집
-            worksheet.write((cc[k]-1)*40+k-2,4,item_brand)
-            worksheet.write((cc[k]-1)*40+k-2,43,item_image)
-            worksheet.write((cc[k]-1)*40+k-2,1,name)
-            worksheet.write((cc[k]-1)*40+k-2,13,sell_price)
-            worksheet.write((cc[k]-1)*40+k-2,18,item_count)
+            num = 0
+            worksheet.write(cc[num]+k+2,4,item_brand)
+            worksheet.write(cc[num]+k+2,43,item_image)
+            worksheet.write(cc[num]+k+2,1,name)
+            worksheet.write(cc[num]+k+2,13,sell_price)
+            worksheet.write(cc[num]+k+2,18,item_count)
+            num += 1
             browser.implicitly_wait(10)
-    workbook.close()
+workbook.close()
