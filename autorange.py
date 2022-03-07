@@ -15,6 +15,13 @@ def dummy_send(element, word, delay):
         browser.find_element_by_id(element).send_keys(c)
         sleep(delay)
 
+# 루프 전체 합
+def sum_of_list(n):
+  total = 0
+  for val in n:
+    total = total + val
+  return total
+
 #   사이트이동 및 창 크게
 browser = webdriver.Chrome("chromedriver.exe")
 browser.maximize_window()
@@ -37,7 +44,7 @@ link_lists = []
 print(len(sub_depth3))
 for sub in sub_depth3:
     menulist = sub.find_elements_by_css_selector("li")
-    for i in range(0,len(menulist)):
+    for i in range(0,(len(menulist)-3)):
         a = menulist[i].find_element_by_css_selector("a")
         link = a.get_attribute("href")
         link_lists.append(link)    
@@ -53,58 +60,71 @@ for link_list in link_lists :
     prices = soup.select('div.item_cont>div.item_info_cont>div.item_money_box')    
     goodnums = soup.select('div.item_cont>div.item_info_cont>div>div.item-type')
     cc = [0]
+    cc_plus = [0]
     for j, pg_num in enumerate(pg_psn, 1) :
         browser.get(link_list+"&page={}".format(j))
         browser.implicitly_wait(10)
         item_cells = browser.find_elements_by_class_name("dbkCateCheck")
         cc.append(len(item_cells))
-        
+        cc_plus.append(sum_of_list(cc))
         for k, item_cell in enumerate(item_cells,0) :
             # 브랜드
-            brand = brands[k].find('strong')
-            try : 
-                brand_txt = brand.text
-                item_brand = brand_txt.replace('[','').replace(']','')
-            except Exception :
-                item_brand = ''
+            if brands : 
+                brand = brands[k].find('strong')
+                try : 
+                    brand_txt = brand.text
+                    item_brand = brand_txt.replace('[','').replace(']','')
+                except Exception :
+                    item_brand = ''
+            else :
+                continue
             # 이미지
-            image = images[k].find('img')['src']
-            try:
-                item_image = 'https://www.ariashop.net/' + image.replace('Main','Detail0')
-            except Exception :
-                item_image = ''
-            
+            if images :
+                image = images[k].find('img')['src']
+                try:
+                    item_image = 'https://www.ariashop.net/' + image.replace('Main','Detail0')
+                except Exception :
+                    item_image = ''
+            else :
+                continue
             # 품목명
-            item_name = item_names[k].find('strong', {'class':'item_name'})
-            try : 
-                name_txt = item_name.text
-                name = name_txt.replace('[PO] ','')
-            except Exception :
-                name = '상품명없음'
-            
+            if item_names :
+                item_name = item_names[k].find('strong', {'class':'item_name'})
+                try : 
+                    name_txt = item_name.text
+                    name = name_txt.replace('[PO] ','')
+                except Exception :
+                    name = '상품명없음'
+            else :
+                continue
             # 가격
-            price = prices[k].find('strong',{'class':'item_price'})
-            try : 
-                buy_price_txt = price.find('span').text
-                buy_price = int(buy_price_txt.replace(',','').replace('원',''))
-                sell_price = buy_price*2
-            except Exception :
-                sell_price = 0    
-            
+            if prices :
+                price = prices[k].find('strong',{'class':'item_price'})
+                try : 
+                    buy_price_txt = price.find('span').text
+                    buy_price = int(buy_price_txt.replace(',','').replace('원',''))
+                    sell_price = buy_price*2
+                except Exception :
+                    sell_price = 0    
+            else :
+                continue    
             # 수량
-            goodnum = goodnums[k].find('span',{'class':'goods-acquisition'})
-            try:
-                item_count_txt = goodnum.text
-                item_count = int(item_count_txt.replace('입수 ',''))
-            except Exception :
-                item_count = 1
+            if goodnums :
+                goodnum = goodnums[k].find('span',{'class':'goods-acquisition'})
+                try:
+                    item_count_txt = goodnum.text
+                    item_count = int(item_count_txt.replace('입수 ',''))
+                except Exception :
+                    item_count = 1
+            else :
+                continue
         # 데이터 수집
             num = 0
-            worksheet.write(cc[num]+k+2,4,item_brand)
-            worksheet.write(cc[num]+k+2,43,item_image)
-            worksheet.write(cc[num]+k+2,1,name)
-            worksheet.write(cc[num]+k+2,13,sell_price)
-            worksheet.write(cc[num]+k+2,18,item_count)
+            worksheet.write(cc_plus[num]+k+2,4,item_brand)
+            worksheet.write(cc_plus[num]+k+2,43,item_image)
+            worksheet.write(cc_plus[num]+k+2,1,name)
+            worksheet.write(cc_plus[num]+k+2,13,sell_price)
+            worksheet.write(cc_plus[num]+k+2,18,item_count)
             num += 1
             browser.implicitly_wait(10)
 workbook.close()
