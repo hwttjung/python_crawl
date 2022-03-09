@@ -41,7 +41,7 @@ sleep(5)
 tit2 = browser.find_elements_by_class_name("tit2")
 sub_depth3 = tit2[0].find_elements_by_class_name("sub_depth3")
 link_lists = []
-print(len(sub_depth3))
+cc = 0
 for sub in sub_depth3:
     menulist = sub.find_elements_by_css_selector("li")
     for i in range(0,(len(menulist)-3)):
@@ -59,14 +59,10 @@ for link_list in link_lists :
     item_names = soup.select('div.item_cont>div.item_info_cont>div.item_tit_box')
     prices = soup.select('div.item_cont>div.item_info_cont>div.item_money_box')    
     goodnums = soup.select('div.item_cont>div.item_info_cont>div>div.item-type')
-    cc = [0]
-    cc_plus = [0]
     for j, pg_num in enumerate(pg_psn, 1) :
         browser.get(link_list+"&page={}".format(j))
         browser.implicitly_wait(10)
         item_cells = browser.find_elements_by_class_name("dbkCateCheck")
-        cc.append(len(item_cells))
-        cc_plus.append(sum_of_list(cc))
         for k, item_cell in enumerate(item_cells,0) :
             # 브랜드
             if brands : 
@@ -119,12 +115,12 @@ for link_list in link_lists :
             else :
                 continue
         # 데이터 수집
-            num = 0
-            worksheet.write(cc_plus[num]+k+2,4,item_brand)
-            worksheet.write(cc_plus[num]+k+2,43,item_image)
-            worksheet.write(cc_plus[num]+k+2,1,name)
-            worksheet.write(cc_plus[num]+k+2,13,sell_price)
-            worksheet.write(cc_plus[num]+k+2,18,item_count)
-            num += 1
+            worksheet.write(cc+k+2,4,item_brand)
+            worksheet.write(cc+k+2,43,item_image)
+            worksheet.write(cc+k+2,1,name)
+            worksheet.write(cc+k+2,13,sell_price)
+            worksheet.write(cc+k+2,18,item_count)
             browser.implicitly_wait(10)
+        cc+=len(item_cells)
+        print(cc)
 workbook.close()
