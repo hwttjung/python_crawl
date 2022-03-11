@@ -15,13 +15,6 @@ def dummy_send(element, word, delay):
         browser.find_element_by_id(element).send_keys(c)
         sleep(delay)
 
-# 루프 전체 합
-def sum_of_list(n):
-  total = 0
-  for val in n:
-    total = total + val
-  return total
-
 #   사이트이동 및 창 크게
 browser = webdriver.Chrome("chromedriver.exe")
 browser.maximize_window()
@@ -54,18 +47,15 @@ for link_list in link_lists :
     pg_psn = page_section[1].find_elements_by_css_selector("li")
     html = browser.page_source 
     soup = BeautifulSoup(html, 'lxml')
-    brands = soup.select('div.item_cont>div>div>span.item_brand')
-    images = soup.select('div.item_cont>div.item_photo_box')
-    item_names = soup.select('div.item_cont>div.item_info_cont>div.item_tit_box')
-    prices = soup.select('div.item_cont>div.item_info_cont>div.item_money_box')    
-    goodnums = soup.select('div.item_cont>div.item_info_cont>div>div.item-type')
     for j, pg_num in enumerate(pg_psn, 1) :
         browser.get(link_list+"&page={}".format(j))
         browser.implicitly_wait(10)
         item_cells = browser.find_elements_by_class_name("dbkCateCheck")
         for k, item_cell in enumerate(item_cells,0) :
+            item_cont = soup.select('div.item_cont')
             # 브랜드
-            if brands : 
+            if item_cont.select('div>div>span.item_brand') : 
+                brands = item_cont.select('div>div>span.item_brand')
                 brand = brands[k].find('strong')
                 try : 
                     brand_txt = brand.text
@@ -73,18 +63,20 @@ for link_list in link_lists :
                 except Exception :
                     item_brand = ''
             else :
-                continue
+                pass
             # 이미지
-            if images :
+            if item_cont.select('div.item_photo_box') :
+                images = item_cont.select('div.item_photo_box')
                 image = images[k].find('img')['src']
                 try:
                     item_image = 'https://www.ariashop.net/' + image.replace('Main','Detail0')
                 except Exception :
                     item_image = ''
             else :
-                continue
+                pass
             # 품목명
-            if item_names :
+            if item_cont.select('div.item_info_cont>div.item_tit_box') :
+                item_names = item_cont.select('div.item_info_cont>div.item_tit_box')
                 item_name = item_names[k].find('strong', {'class':'item_name'})
                 try : 
                     name_txt = item_name.text
@@ -92,9 +84,10 @@ for link_list in link_lists :
                 except Exception :
                     name = '상품명없음'
             else :
-                continue
+                pass
             # 가격
-            if prices :
+            if item_cont.select('div.item_info_cont>div.item_money_box')   :
+                prices = item_cont.select('div.item_info_cont>div.item_money_box')  
                 price = prices[k].find('strong',{'class':'item_price'})
                 try : 
                     buy_price_txt = price.find('span').text
@@ -103,9 +96,10 @@ for link_list in link_lists :
                 except Exception :
                     sell_price = 0    
             else :
-                continue    
+                pass    
             # 수량
-            if goodnums :
+            if item_cont.select('div.item_info_cont>div>div.item-type') :
+                goodnums = item_cont.select('div.item_info_cont>div>div.item-type')
                 goodnum = goodnums[k].find('span',{'class':'goods-acquisition'})
                 try:
                     item_count_txt = goodnum.text
@@ -113,7 +107,7 @@ for link_list in link_lists :
                 except Exception :
                     item_count = 1
             else :
-                continue
+                pass
         # 데이터 수집
             worksheet.write(cc+k+2,4,item_brand)
             worksheet.write(cc+k+2,43,item_image)
