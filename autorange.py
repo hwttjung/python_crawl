@@ -37,7 +37,7 @@ link_lists = []
 cc = 0
 for sub in sub_depth3:
     menulist = sub.find_elements_by_css_selector("li")
-    for i in range(0,(len(menulist)-3)):
+    for i in range(0,(len(menulist))):
         a = menulist[i].find_element_by_css_selector("a")
         link = a.get_attribute("href")
         link_lists.append(link)    
@@ -50,13 +50,14 @@ for link_list in link_lists :
     for j, pg_num in enumerate(pg_psn, 1) :
         browser.get(link_list+"&page={}".format(j))
         browser.implicitly_wait(10)
-        item_cells = browser.find_elements_by_class_name("dbkCateCheck")
+        item_cells = soup.findAll('li','dbkCateCheck')
+        
         for k, item_cell in enumerate(item_cells,0) :
-            item_cont = soup.select('div.item_cont')
+            item_cont = soup.findAll('div','item_cont')
             # 브랜드
-            if item_cont.select('div>div>span.item_brand') : 
-                brands = item_cont.select('div>div>span.item_brand')
-                brand = brands[k].find('strong')
+            if item_cont[k].find('span','item_brand') : 
+                brands = item_cont[k].find('span','item_brand')
+                brand = brands.find('strong')
                 try : 
                     brand_txt = brand.text
                     item_brand = brand_txt.replace('[','').replace(']','')
@@ -65,9 +66,9 @@ for link_list in link_lists :
             else :
                 pass
             # 이미지
-            if item_cont.select('div.item_photo_box') :
-                images = item_cont.select('div.item_photo_box')
-                image = images[k].find('img')['src']
+            if item_cont[k].find('div','item_photo_box') :
+                images = item_cont[k].find('div','item_photo_box')
+                image = images.find('img')['src']
                 try:
                     item_image = 'https://www.ariashop.net/' + image.replace('Main','Detail0')
                 except Exception :
@@ -75,9 +76,9 @@ for link_list in link_lists :
             else :
                 pass
             # 품목명
-            if item_cont.select('div.item_info_cont>div.item_tit_box') :
-                item_names = item_cont.select('div.item_info_cont>div.item_tit_box')
-                item_name = item_names[k].find('strong', {'class':'item_name'})
+            if item_cont[k].find('div','item_tit_box') :
+                item_names = item_cont[k].find('div','item_tit_box')
+                item_name = item_names.find('strong','item_name')
                 try : 
                     name_txt = item_name.text
                     name = name_txt.replace('[PO] ','')
@@ -86,9 +87,9 @@ for link_list in link_lists :
             else :
                 pass
             # 가격
-            if item_cont.select('div.item_info_cont>div.item_money_box')   :
-                prices = item_cont.select('div.item_info_cont>div.item_money_box')  
-                price = prices[k].find('strong',{'class':'item_price'})
+            if item_cont[k].find('div','item_money_box')   :
+                prices = item_cont[k].find('div','item_money_box')  
+                price = prices.find('strong','item_price')
                 try : 
                     buy_price_txt = price.find('span').text
                     buy_price = int(buy_price_txt.replace(',','').replace('원',''))
@@ -98,9 +99,9 @@ for link_list in link_lists :
             else :
                 pass    
             # 수량
-            if item_cont.select('div.item_info_cont>div>div.item-type') :
-                goodnums = item_cont.select('div.item_info_cont>div>div.item-type')
-                goodnum = goodnums[k].find('span',{'class':'goods-acquisition'})
+            if item_cont[k].find('div','item-type') :
+                goodnums = item_cont[k].find('div','item-type')
+                goodnum = goodnums.find('span','goods-acquisition')
                 try:
                     item_count_txt = goodnum.text
                     item_count = int(item_count_txt.replace('입수 ',''))
@@ -116,5 +117,5 @@ for link_list in link_lists :
             worksheet.write(cc+k+2,18,item_count)
             browser.implicitly_wait(10)
         cc+=len(item_cells)
-        print(cc)
+        
 workbook.close()
